@@ -1,0 +1,17 @@
+[package]
+
+name = "ordered_iter"
+version = "0.0.1"
+license = "MIT/Apache-2.0"
+description = "Ordered iterators."
+
+authors = [
+    "Alexis Beingessner <a.beingessner@gmail.com>",
+    "Andrew Paseltiner <apaseltiner@gmail.com>",
+]
+
+repository = "https://github.com/contain-rs/ordered_iter"
+homepage = "https://github.com/contain-rs/ordered_iter"
+documentation = "https://contain-rs.github.io/ordered_iter/ordered_iter"
+keywords = ["data-structures"]
+readme = "README.md"
