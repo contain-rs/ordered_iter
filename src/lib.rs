@@ -253,6 +253,18 @@ impl<'a, K: Ord, V> OrderedMapIterator for btree_map::Iter<'a, K, V> {
     type Val = &'a V;
 }
 
+impl<K: Ord, V> OrderedMapIterator for btree_map::IntoIter<K, V> {
+    type Key = K;
+    type Val = V;
+}
+
+impl<'a, K: Ord, V> OrderedMapIterator for btree_map::IterMut<'a, K, V> {
+    type Key = &'a K;
+    type Val = &'a mut V;
+}
+
+impl<'a, K: Ord, V> OrderedSetIterator for btree_map::Keys<'a, K, V> {}
+
 impl<'a, V> OrderedMapIterator for vec_map::Iter<'a, V> {
     type Key = usize;
     type Val = &'a V;
