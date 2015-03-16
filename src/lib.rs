@@ -13,13 +13,14 @@ use std::collections::{
     bit_set
 };
 
-/// Allows an iterator to be do an inner join with another
+/// Allows an iterator to do an inner join with another
 /// iterator to combine their values or filter based on their keys.
-/// this trait is applied to an iterator over a map like structure
+///
+/// This trait is applied to an iterator over a map-like structure.
 pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, <Self as OrderedMapIterator>::Val)> + Sized {
     type Key;
     type Val;
-    /// join two ordered maps together
+    /// Joins two ordered maps together.
     fn inner_join_map<I>(self, map: I) -> InnerJoinMapIterator<Self, I>
     where I: OrderedMapIterator<Key=Self::Key> {
         InnerJoinMapIterator {
@@ -28,7 +29,7 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
         }
     }
 
-    /// filter an ordered map with an ordered set
+    /// Filters an ordered map with an ordered set.
     fn inner_join_set<I>(self, set: I) -> InnerJoinMapSetIterator<Self, I>
     where I: OrderedSetIterator<Item=Self::Key> {
         InnerJoinMapSetIterator {
@@ -37,13 +38,14 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
         }
     }
 
-    /// Join an ordered iterator with the right ordered iterator. The
-    /// new iterator will return a key value pair for every key in
-    /// either iterator. If a key is present in both iterators they
-    /// will be returned together (two values). If a value is in the Right,
-    /// but not the left iterator it will be return without the value in the
-    /// left iterator. If the value is in the left iterator by not the right
-    /// that will be return without the value from the left iterator.
+    /// Joins an ordered iterator with the right ordered iterator.
+    ///
+    /// The new iterator will return a key-value pair for every key in
+    /// either iterator. If a key is present in both iterators, they
+    /// will be returned together (two values). If a value is in the right iterator
+    /// but not the left, it will be returned without the value in the
+    /// left iterator. If the value is in the left iterator but not the right,
+    /// it will be returned without the value from the left iterator.
     fn outer_join<I>(self, right: I) -> OuterJoinIterator<Self, I>
     where I: OrderedMapIterator<Key=Self::Key> {
         OuterJoinIterator {
@@ -53,11 +55,12 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
     }
 }
 
-/// Allows an iterator to be do an inner join with another
+/// Allows an iterator to do an inner join with another
 /// iterator to combine their values or filter based on their keys.
-/// this trait is applied to an iterator over a set like structure
+///
+/// This trait is applied to an iterator over a set-like structure.
 pub trait OrderedSetIterator: Iterator + Sized {
-    /// join two ordered maps together
+    /// Joins two ordered maps together.
     fn inner_join_map<I>(self, map: I) -> InnerJoinMapSetIterator<I, Self>
     where I: OrderedMapIterator<Key=Self::Item> {
         InnerJoinMapSetIterator {
@@ -66,7 +69,7 @@ pub trait OrderedSetIterator: Iterator + Sized {
         }
     }
 
-    /// filter an ordered map with an ordered set
+    /// Filters an ordered map with an ordered set.
     fn inner_join_set<I>(self, map: I) -> InnerJoinSetIterator<Self, I>
     where I: OrderedSetIterator<Item=Self::Item> {
         InnerJoinSetIterator {
