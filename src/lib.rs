@@ -21,18 +21,18 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
     type Key;
     type Val;
     /// Joins two ordered maps together.
-    fn inner_join_map<I>(self, map: I) -> InnerJoinMapIterator<Self, I>
+    fn inner_join_map<I>(self, map: I) -> InnerJoinMap<Self, I>
     where I: OrderedMapIterator<Key=Self::Key> {
-        InnerJoinMapIterator {
+        InnerJoinMap {
             a: self,
             b: map
         }
     }
 
     /// Filters an ordered map with an ordered set.
-    fn inner_join_set<I>(self, set: I) -> InnerJoinMapSetIterator<Self, I>
+    fn inner_join_set<I>(self, set: I) -> InnerJoinMapSet<Self, I>
     where I: OrderedSetIterator<Item=Self::Key> {
-        InnerJoinMapSetIterator {
+        InnerJoinMapSet {
             map: self,
             set: set
         }
@@ -46,9 +46,9 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
     /// but not `self`, it will be returned without the value in
     /// `self`. If the value is in `self` but not `other`,
     /// it will be returned without the value from `other`.
-    fn outer_join<I>(self, other: I) -> OuterJoinIterator<Self, I>
+    fn outer_join<I>(self, other: I) -> OuterJoin<Self, I>
     where I: OrderedMapIterator<Key=Self::Key> {
-        OuterJoinIterator {
+        OuterJoin {
             left: self.peekable(),
             right: other.peekable()
         }
@@ -61,18 +61,18 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
 /// This trait is applied to an iterator over a set-like structure.
 pub trait OrderedSetIterator: Iterator + Sized {
     /// Joins two ordered maps together.
-    fn inner_join_map<I>(self, map: I) -> InnerJoinMapSetIterator<I, Self>
+    fn inner_join_map<I>(self, map: I) -> InnerJoinMapSet<I, Self>
     where I: OrderedMapIterator<Key=Self::Item> {
-        InnerJoinMapSetIterator {
+        InnerJoinMapSet {
             map: map,
             set: self
         }
     }
 
     /// Filters an ordered map with an ordered set.
-    fn inner_join_set<I>(self, map: I) -> InnerJoinSetIterator<Self, I>
+    fn inner_join_set<I>(self, map: I) -> InnerJoinSet<Self, I>
     where I: OrderedSetIterator<Item=Self::Item> {
-        InnerJoinSetIterator {
+        InnerJoinSet {
             a: self,
             b: map
         }
@@ -80,24 +80,24 @@ pub trait OrderedSetIterator: Iterator + Sized {
 }
 
 #[derive(Clone)]
-pub struct InnerJoinMapIterator<A, B> {a: A, b: B}
+pub struct InnerJoinMap<A, B> {a: A, b: B}
 #[derive(Clone)]
-pub struct InnerJoinMapSetIterator<A, B> {map: A, set: B}
+pub struct InnerJoinMapSet<A, B> {map: A, set: B}
 #[derive(Clone)]
-pub struct InnerJoinSetIterator<A, B> {a: A, b: B}
-pub struct OuterJoinIterator<A: Iterator, B: Iterator> {
+pub struct InnerJoinSet<A, B> {a: A, b: B}
+pub struct OuterJoin<A: Iterator, B: Iterator> {
     left: Peekable<A>,
     right: Peekable<B>,
 }
 
-impl<A, B> Clone for OuterJoinIterator<A, B>
+impl<A, B> Clone for OuterJoin<A, B>
 where A: Clone + Iterator, B: Clone + Iterator, A::Item: Clone, B::Item: Clone {
-    fn clone(&self) -> OuterJoinIterator<A, B> {
-        OuterJoinIterator { left: self.left.clone(), right: self.right.clone() }
+    fn clone(&self) -> OuterJoin<A, B> {
+        OuterJoin { left: self.left.clone(), right: self.right.clone() }
     }
 }
 
-impl<A, B> Iterator for InnerJoinMapIterator<A, B>
+impl<A, B> Iterator for InnerJoinMap<A, B>
 where A: OrderedMapIterator,
       B: OrderedMapIterator<Key=A::Key>,
       A::Key: Ord,
@@ -143,7 +143,7 @@ where A: OrderedMapIterator,
 }
 
 
-impl<A, B> Iterator for InnerJoinSetIterator<A, B>
+impl<A, B> Iterator for InnerJoinSet<A, B>
 where A: OrderedSetIterator,
       B: OrderedSetIterator<Item=A::Item>,
       A::Item: Ord,
@@ -182,7 +182,7 @@ where A: OrderedSetIterator,
     }
 }
 
-impl<MapIter, SetIter> Iterator for InnerJoinMapSetIterator<MapIter, SetIter>
+impl<MapIter, SetIter> Iterator for InnerJoinMapSet<MapIter, SetIter>
 where SetIter: OrderedSetIterator,
       MapIter: OrderedMapIterator<Key=SetIter::Item>,
       MapIter::Key: Ord,
@@ -224,7 +224,7 @@ where SetIter: OrderedSetIterator,
     }
 }
 
-impl<A, B> Iterator for OuterJoinIterator<A, B>
+impl<A, B> Iterator for OuterJoin<A, B>
 where A: OrderedMapIterator,
       B: OrderedMapIterator<Key=A::Key>,
       A::Key: Ord + Eq,
@@ -285,7 +285,7 @@ impl<'a, V> OrderedMapIterator for vec_map::Iter<'a, V> {
 
 impl<'a> OrderedSetIterator for bit_set::Iter<'a> {}
 
-impl<A, B> OrderedMapIterator for InnerJoinMapIterator<A, B>
+impl<A, B> OrderedMapIterator for InnerJoinMap<A, B>
 where A: OrderedMapIterator,
       B: OrderedMapIterator<Key=A::Key>,
       A::Key: Ord,
@@ -294,7 +294,7 @@ where A: OrderedMapIterator,
     type Val = (A::Val, B::Val);
 }
 
-impl<A, B> OrderedMapIterator for InnerJoinMapSetIterator<A, B>
+impl<A, B> OrderedMapIterator for InnerJoinMapSet<A, B>
 where A: OrderedMapIterator,
       B: OrderedSetIterator<Item=A::Key>,
       A::Key: Ord,
@@ -303,7 +303,7 @@ where A: OrderedMapIterator,
     type Val = A::Val;
 }
 
-impl<A, B> OrderedSetIterator for InnerJoinSetIterator<A, B>
+impl<A, B> OrderedSetIterator for InnerJoinSet<A, B>
 where A: OrderedSetIterator,
       B: OrderedSetIterator<Item=A::Item>,
       A::Item: Ord,
