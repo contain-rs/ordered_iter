@@ -38,19 +38,19 @@ pub trait OrderedMapIterator: Iterator<Item=(<Self as OrderedMapIterator>::Key, 
         }
     }
 
-    /// Joins an ordered iterator with the right ordered iterator.
+    /// Joins an ordered iterator with another ordered iterator.
     ///
     /// The new iterator will return a key-value pair for every key in
     /// either iterator. If a key is present in both iterators, they
-    /// will be returned together (two values). If a value is in the right iterator
-    /// but not the left, it will be returned without the value in the
-    /// left iterator. If the value is in the left iterator but not the right,
-    /// it will be returned without the value from the left iterator.
-    fn outer_join<I>(self, right: I) -> OuterJoinIterator<Self, I>
+    /// will be returned together (two values). If a value is in `other`
+    /// but not `self`, it will be returned without the value in
+    /// `self`. If the value is in `self` but not `other`,
+    /// it will be returned without the value from `other`.
+    fn outer_join<I>(self, other: I) -> OuterJoinIterator<Self, I>
     where I: OrderedMapIterator<Key=Self::Key> {
         OuterJoinIterator {
             left: self.peekable(),
-            right: right.peekable()
+            right: other.peekable()
         }
     }
 }
