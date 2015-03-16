@@ -79,12 +79,22 @@ pub trait OrderedSetIterator: Iterator + Sized {
     }
 }
 
+#[derive(Clone)]
 pub struct InnerJoinMapIterator<A, B> {a: A, b: B}
+#[derive(Clone)]
 pub struct InnerJoinMapSetIterator<A, B> {map: A, set: B}
+#[derive(Clone)]
 pub struct InnerJoinSetIterator<A, B> {a: A, b: B}
 pub struct OuterJoinIterator<A: Iterator, B: Iterator> {
     left: Peekable<A>,
     right: Peekable<B>,
+}
+
+impl<A, B> Clone for OuterJoinIterator<A, B>
+where A: Clone + Iterator, B: Clone + Iterator, A::Item: Clone, B::Item: Clone {
+    fn clone(&self) -> OuterJoinIterator<A, B> {
+        OuterJoinIterator { left: self.left.clone(), right: self.right.clone() }
+    }
 }
 
 impl<A, B> Iterator for InnerJoinMapIterator<A, B>
