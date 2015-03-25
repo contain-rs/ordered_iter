@@ -1,6 +1,6 @@
 //! Ordered iterators.
 
-#![cfg_attr(test, feature(core, test))]
+#![cfg_attr(test, feature(test))]
 
 #[cfg(test)]
 extern crate test;
@@ -320,8 +320,8 @@ mod tests {
     fn join_two_sets() {
         use std::collections::BTreeSet;
 
-        let powers_of_two: BTreeSet<i32> = range(1, 10).map(|x| x * 2).collect();
-        let powers_of_three: BTreeSet<i32> = range(1, 10).map(|x| x * 3).collect();
+        let powers_of_two: BTreeSet<i32> = (1..10).map(|x| x * 2).collect();
+        let powers_of_three: BTreeSet<i32> = (1..10).map(|x| x * 3).collect();
 
         let expected = vec![6, 12, 18];
 
@@ -338,9 +338,9 @@ mod tests {
     fn join_three_sets() {
         use std::collections::BTreeSet;
 
-        let powers_of_two: BTreeSet<i32> = range(1, 100).map(|x| x * 2).collect();
-        let powers_of_three: BTreeSet<i32> = range(1, 100).map(|x| x * 3).collect();
-        let powers_of_five: BTreeSet<i32> = range(1, 100).map(|x| x * 5).collect();
+        let powers_of_two: BTreeSet<i32> = (1..100).map(|x| x * 2).collect();
+        let powers_of_three: BTreeSet<i32> = (1..100).map(|x| x * 3).collect();
+        let powers_of_five: BTreeSet<i32> = (1..100).map(|x| x * 5).collect();
 
         let expected = vec![30, 60, 90, 120, 150, 180];
 
@@ -358,8 +358,8 @@ mod tests {
     fn join_two_maps() {
         use std::collections::BTreeMap;
 
-        let powers_of_two: BTreeMap<i32, i32> = range(1, 10).map(|x| (x * 2, x)).collect();
-        let powers_of_three: BTreeMap<i32, i32> = range(1, 10).map(|x| (x * 3, x)).collect();
+        let powers_of_two: BTreeMap<i32, i32> = (1..10).map(|x| (x * 2, x)).collect();
+        let powers_of_three: BTreeMap<i32, i32> = (1..10).map(|x| (x * 3, x)).collect();
 
         let mut powers_of_two_and_three =
             powers_of_two.iter().inner_join_map(powers_of_three.iter())
@@ -375,8 +375,8 @@ mod tests {
     fn join_two_maps_to_set() {
         use std::collections::{BTreeMap, BTreeSet};
 
-        let powers_of_two: BTreeSet<i32> = range(1, 10).map(|x| x * 2).collect();
-        let powers_of_three: BTreeMap<i32, i32> = range(1, 10).map(|x| (x * 3, x)).collect();
+        let powers_of_two: BTreeSet<i32> = (1..10).map(|x| x * 2).collect();
+        let powers_of_three: BTreeMap<i32, i32> = (1..10).map(|x| (x * 3, x)).collect();
 
         let mut powers_of_two_and_three =
             powers_of_two.iter().inner_join_map(powers_of_three.iter())
@@ -392,8 +392,8 @@ mod tests {
     fn outer_join_fizz_buzz() {
         use std::collections::BTreeMap;
 
-        let mul_of_three: BTreeMap<i32, i32> = range(0, 100).map(|x| (x*3, x)).collect();
-        let mul_of_five: BTreeMap<i32, i32> = range(0, 100).map(|x| (x*5, x)).collect();
+        let mul_of_three: BTreeMap<i32, i32> = (0..100).map(|x| (x*3, x)).collect();
+        let mul_of_five: BTreeMap<i32, i32> = (0..100).map(|x| (x*5, x)).collect();
 
         let mut fizz_buzz = BTreeMap::new();
 
@@ -402,7 +402,7 @@ mod tests {
             fizz_buzz.insert(key, (three.is_some(), five.is_some()));
         }
 
-        let res: BTreeMap<i32, String> = range(1, 100).map(|i|
+        let res: BTreeMap<i32, String> = (1..100).map(|i|
             (i, match fizz_buzz.get(&i) {
                 None => format!("{}", i),
                 Some(&(true, false)) => format!("Fizz"),
@@ -411,12 +411,12 @@ mod tests {
                 Some(&(false, false)) => panic!("Outer join failed...")
             })).collect();
 
-        for i in range(1, 100) {
+        for i in 1..100 {
             match (i % 3, i % 5) {
-                (0, 0) => assert_eq!("FizzBuzz", res[i].as_slice()),
-                (0, _) => assert_eq!("Fizz", res[i].as_slice()),
-                (_, 0) => assert_eq!("Buzz", res[i].as_slice()),
-                _ => assert_eq!(format!("{}", i).as_slice(), res[i].as_slice())
+                (0, 0) => assert_eq!("FizzBuzz", res[&i]),
+                (0, _) => assert_eq!("Fizz", res[&i]),
+                (_, 0) => assert_eq!("Buzz", res[&i]),
+                _ => assert_eq!(format!("{}", i), res[&i])
             }
         }
     }
@@ -426,8 +426,8 @@ mod tests {
     pub fn inner_join_map(b: &mut test::Bencher) {
         use std::collections::BTreeSet;
 
-        let powers_of_two: BTreeSet<u32> = range(1, 1000000).map(|x| x * 2).collect();
-        let powers_of_three: BTreeSet<u32> = range(1, 1000000).map(|x| x * 3).collect();
+        let powers_of_two: BTreeSet<u32> = (1..1000000).map(|x| x * 2).collect();
+        let powers_of_three: BTreeSet<u32> = (1..1000000).map(|x| x * 3).collect();
 
         b.iter(||{
             for x in powers_of_two.iter()
