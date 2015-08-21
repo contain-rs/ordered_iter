@@ -1,16 +1,15 @@
 //! Ordered iterators.
 
-#![cfg_attr(test, feature(test))]
+#![cfg_attr(all(feature = "nightly", test), feature(test))]
 
-#[cfg(test)]
-extern crate test;
+extern crate bit_set;
+extern crate bit_vec;
+extern crate vec_map;
 
 use std::cmp::Ordering::*;
 use std::iter::Peekable;
 use std::collections::{
     btree_map, btree_set,
-    vec_map,
-    bit_set
 };
 
 /// Allows an iterator to do an inner join with another
@@ -283,7 +282,7 @@ impl<'a, V> OrderedMapIterator for vec_map::Iter<'a, V> {
     type Val = &'a V;
 }
 
-impl<'a> OrderedSetIterator for bit_set::Iter<'a> {}
+impl<'a, B: bit_vec::BitBlock> OrderedSetIterator for bit_set::Iter<'a, B> {}
 
 impl<A, B> OrderedMapIterator for InnerJoinMap<A, B>
 where A: OrderedMapIterator,
@@ -311,8 +310,8 @@ where A: OrderedSetIterator,
 
 #[cfg(test)]
 mod tests {
-    use test::Bencher;
-    use test;
+    #[cfg(all(feature = "nightly", test))]
+    extern crate test;
 
     use super::{OrderedSetIterator, OrderedMapIterator};
 
@@ -421,9 +420,9 @@ mod tests {
         }
     }
 
-
     #[bench]
-    pub fn inner_join_map(b: &mut test::Bencher) {
+    #[cfg(all(feature = "nightly", test))]
+    pub fn inner_join_map(b: &mut self::test::Bencher) {
         use std::collections::BTreeSet;
 
         let powers_of_two: BTreeSet<u32> = (1..1000000).map(|x| x * 2).collect();
