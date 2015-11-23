@@ -308,6 +308,16 @@ where A: OrderedSetIterator,
       A::Item: Ord,
 {}
 
+impl<A, B> OrderedMapIterator for OuterJoin<A, B>
+where A: OrderedMapIterator,
+      B: OrderedMapIterator<Key=A::Key>,
+      A::Key: Ord,
+{
+    type Key = A::Key;
+    type Val = (Option<A::Val>, Option<B::Val>);
+}
+
+
 #[cfg(test)]
 mod tests {
     #[cfg(all(feature = "nightly", test))]
