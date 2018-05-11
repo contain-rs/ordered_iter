@@ -20,6 +20,6 @@ readme = "README.md"
 nightly = []
 
 [dependencies]
-bit-set = "0.2"
-bit-vec = "0.4"
-vec_map = "0.3"
+bit-set = "~0.5"
+bit-vec = "~0.5"
+vec_map = "~0.8"
